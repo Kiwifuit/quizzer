@@ -27,13 +27,13 @@ impl Quiz {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct QuizItem {
+struct QuizItem {
     prompt: String,
     answer: String
 }
 
 impl QuizItem {
-    pub fn new(prompt: String, answer: String) -> Self {
+    fn new(prompt: String, answer: String) -> Self {
         Self {
             prompt,
             answer
