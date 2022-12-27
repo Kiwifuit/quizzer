@@ -8,11 +8,11 @@ pub struct Quiz {
 }
 
 impl Quiz {
-    pub fn new(name: String, perfect_score: u8, items: Vec<(&str, &str)>) -> Self {
+    pub fn new(name: &str, perfect_score: u8, items: Vec<(&str, &str)>) -> Self {
         let items = items.iter().map(|&i| QuizItem::new(i.0, i.1)).collect();
 
         Self {
-            name,
+            name: name.to_string(),
             perfect_score,
             items
         }
