@@ -1,16 +1,19 @@
 use std::fmt::Display;
 use std::io::{Write, stdout, stdin};
+use std::str::FromStr;
 
+#[derive(Debug)]
 pub enum ErrorKind {
     StdoutFlushError(String),
     StdinReadError(String),
+    ParseError,
     ValidationError
 }
 
 pub fn prompt<Return, Prompt>(prompt:Prompt, validation: fn(&String) -> bool) -> Result<Return, ErrorKind>
     where
     Prompt: Display,
-    Return: From<String> {
+    Return: FromStr {
     let mut buffer = String::new();
 
     print!("{}: ", prompt);
@@ -25,7 +28,10 @@ pub fn prompt<Return, Prompt>(prompt:Prompt, validation: fn(&String) -> bool) ->
     };
 
     if validation(&buffer) {
-        return Ok(Return::from(buffer));
+        return match buffer.parse() {
+            Ok(parsed) => Ok(parsed),
+            Err(_) => Err(ErrorKind::ParseError)
+        };
     }
     Err(ErrorKind::ValidationError)
 }
