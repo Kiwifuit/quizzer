@@ -1,4 +1,4 @@
-use std::{fs::File, io::{Write, Read}};
+use std::{fs::File, io::{Write, Read}, fmt::Display};
 
 use bincode::{serialize, deserialize};
 use crate::quiz::Quiz;
@@ -9,6 +9,17 @@ pub enum ErrorKind {
     DeserializationError(String),
     WriteError(String),
     ReadError(String),
+}
+
+impl Display for ErrorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            Self::DeserializationError(e) => format!("Unable to read data: {}", e),
+            Self::SerializationError(e) => format!("Unable to write data: {}", e),
+            Self::ReadError(e) => format!("Unable to read file: {}", e),
+            Self::WriteError(e) => format!("Unable to write data to file: {}", e),
+        })
+    }
 }
 
 pub fn save_quiz(quiz: &Quiz, file: &mut File) -> Result<usize, ErrorKind>{
