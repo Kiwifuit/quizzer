@@ -1,10 +1,10 @@
 use std::fs::File;
 use std::process::exit;
 
-mod quiz;
 mod data;
-mod prompt;
 mod objects;
+mod prompt;
+mod quiz;
 
 const SCORE_CAP: u8 = 100;
 
@@ -22,36 +22,47 @@ fn get_perfect_score() -> u8 {
 
             match e {
                 prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => continue,
-                prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => exit(1)
+                prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => {
+                    exit(1)
+                }
             };
         }
 
-        return score.unwrap()
+        return score.unwrap();
     }
 }
 
 fn get_quiz_count() -> u8 {
     loop {
-        let count = prompt::prompt::<u8, &str>("Enter the perfect score", |_| {
-            match prompt::prompt::<objects::ConfirmChoice, &str>("Are you sure? This cannot be changed until you restart the program (yes/no)", |_| true) {
-                Ok(c) => c.into(),
-                Err(e) => {
-                    eprintln!("An error occurred while trying to confirm the perfect score: {}", e);
-                    exit(1)
+        let count =
+            prompt::prompt::<u8, &str>("Enter the perfect score", |_| {
+                match prompt::prompt::<objects::ConfirmChoice, &str>(
+                    "Are you sure? This cannot be changed until you restart the program (yes/no)",
+                    |_| true,
+                ) {
+                    Ok(c) => c.into(),
+                    Err(e) => {
+                        eprintln!(
+                            "An error occurred while trying to confirm the perfect score: {}",
+                            e
+                        );
+                        exit(1)
+                    }
                 }
-            }
-        });
+            });
 
         if let Err(e) = count {
             eprintln!("An error occurred while getting user input: {}", e);
 
             match e {
                 prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => continue,
-                prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => exit(2)
+                prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => {
+                    exit(2)
+                }
             };
         }
 
-        return count.unwrap()
+        return count.unwrap();
     }
 }
 
@@ -63,8 +74,11 @@ fn get_name() -> String {
 
     if let Err(e) = &name {
         match e {
-            prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {eprintln!("Error while reading/writing to the terminal: {}", e); exit(1)}
-            prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => ()
+            prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {
+                eprintln!("Error while reading/writing to the terminal: {}", e);
+                exit(1)
+            }
+            prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => (),
         };
     }
 
@@ -78,31 +92,45 @@ fn store_quiz() {
     let mut quiz = quiz::Quiz::new(name.as_str(), score, count);
 
     for _ in 0..count {
-        let question = prompt::prompt::<String, String>(format!("Enter question #{}", &count), |_| true);
+        let question =
+            prompt::prompt::<String, String>(format!("Enter question #{}", &count), |_| true);
 
         if let Err(e) = &question {
             match e {
-                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {eprintln!("Error while reading/writing to the terminal: {}", e); exit(3)}
-                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => ()
+                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {
+                    eprintln!("Error while reading/writing to the terminal: {}", e);
+                    exit(3)
+                }
+                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => (),
             };
         }
 
-        let answer = prompt::prompt::<String, String>(format!("Enter answer #{}", &count), |_| true);
+        let answer =
+            prompt::prompt::<String, String>(format!("Enter answer #{}", &count), |_| true);
 
         if let Err(e) = &answer {
             match e {
-                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {eprintln!("Error while reading/writing to the terminal: {}", e); exit(3)}
-                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => ()
+                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {
+                    eprintln!("Error while reading/writing to the terminal: {}", e);
+                    exit(3)
+                }
+                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => (),
             };
         }
 
         quiz.add_new(question.unwrap(), answer.unwrap());
     }
 
-    let mut save_file = File::options().write(true).open(format!("{}.quiz", name)).unwrap();
+    let mut save_file = File::options()
+        .write(true)
+        .open(format!("{}.quiz", name))
+        .unwrap();
 
     if let Err(e) = data::save_quiz(&quiz, &mut save_file) {
-        eprintln!("An error occurred while trying to save quiz to a file: {}", e);
+        eprintln!(
+            "An error occurred while trying to save quiz to a file: {}",
+            e
+        );
         exit(5)
     }
 }
@@ -111,35 +139,66 @@ fn read_quiz() {
     let file = prompt::prompt::<objects::ReadOnlyFile, &str>("Enter file to read: ", |_| true);
 
     if let Err(e) = &file {
-        eprintln!("{}",
-        match e {
-            prompt::ErrorKind::ParseError => format!("The file does not exist"),
-            other => format!("An unexpected error occurred while getting a RO file: {}", other)
-        });
+        eprintln!(
+            "{}",
+            match e {
+                prompt::ErrorKind::ParseError => format!("The file does not exist"),
+                other => format!(
+                    "An unexpected error occurred while getting a RO file: {}",
+                    other
+                ),
+            }
+        );
 
         exit(7)
     }
 
     let file = file.unwrap();
-    let quiz = match data::read_quiz(&mut file.try_into().unwrap()) {
+    let mut quiz = match data::read_quiz(&mut file.try_into().unwrap()) {
         Ok(q) => q,
         Err(e) => {
             match e {
-                data::ErrorKind::DeserializationError(err) => eprintln!("An error occurred while deserializing the data: {}", err),
-                data::ErrorKind::ReadError(err) => eprintln!("An error occurred while reading the file: {}", err),
-                _false_positive => ()
+                data::ErrorKind::DeserializationError(err) => {
+                    eprintln!("An error occurred while deserializing the data: {}", err)
+                }
+                data::ErrorKind::ReadError(err) => {
+                    eprintln!("An error occurred while reading the file: {}", err)
+                }
+                _false_positive => (),
             };
 
             exit(8);
         }
     };
+
+    println!(
+        "Quiz Name: {}\nPerfect Score: {}\n",
+        quiz.get_name(),
+        quiz.get_perfect_score()
+    );
+
+    for indx in 0..quiz.count() {
+        let item = quiz.get_item_at(&indx);
+
+        if let Some(item) = item {
+            println!(
+                "Question #{}:\n\t{:?}\n\tAnswer: {:?}",
+                indx,
+                item.get_prompt(),
+                item.get_answer()
+            )
+        }
+    }
 }
 
 fn main() {
     let action = prompt::prompt::<objects::Action, &str>("Enter action (read/write)", |_| true);
 
     if let Err(e) = action {
-        eprintln!("An error occurred while trying to request for an action: {}", e);
+        eprintln!(
+            "An error occurred while trying to request for an action: {}",
+            e
+        );
         exit(6)
     }
 
