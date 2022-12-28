@@ -202,9 +202,8 @@ fn main() {
         exit(6)
     }
 
-    if action.unwrap().into() {
-        store_quiz()
-    } else {
-        read_quiz()
-    }
+    match action.unwrap() {
+        objects::Action::Read => read_quiz(),
+        objects::Action::Write => store_quiz(),
+    };
 }

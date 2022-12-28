@@ -1,8 +1,8 @@
-use std::{str::FromStr, fs, io};
+use std::{fs, io, str::FromStr};
 
 pub enum ConfirmChoice {
     Yes,
-    No
+    No,
 }
 
 impl FromStr for ConfirmChoice {
@@ -24,14 +24,14 @@ impl Into<bool> for ConfirmChoice {
     fn into(self) -> bool {
         match self {
             Self::Yes => true,
-            Self::No => false
+            Self::No => false,
         }
     }
 }
 
 pub enum Action {
     Read,
-    Write
+    Write,
 }
 
 impl FromStr for Action {
@@ -49,17 +49,8 @@ impl FromStr for Action {
     }
 }
 
-impl Into<bool> for Action {
-    fn into(self) -> bool {
-        match self {
-            Self::Write => true,
-            Self::Read => false
-        }
-    }
-}
-
 pub struct ReadOnlyFile {
-    file: String
+    file: String,
 }
 
 impl TryInto<fs::File> for ReadOnlyFile {
@@ -68,7 +59,7 @@ impl TryInto<fs::File> for ReadOnlyFile {
     fn try_into(self) -> Result<fs::File, Self::Error> {
         match fs::File::options().read(true).open(self.file) {
             Ok(f) => Ok(f),
-            Err(e) => Err(e)
+            Err(e) => Err(e),
         }
     }
 }
@@ -77,6 +68,8 @@ impl FromStr for ReadOnlyFile {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self{ file: s.to_string() })
+        Ok(Self {
+            file: s.to_string(),
+        })
     }
 }
