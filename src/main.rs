@@ -1,4 +1,5 @@
-use std::{process::exit, fs::File};
+use std::fs::File;
+use std::process::exit;
 
 mod quiz;
 mod data;
