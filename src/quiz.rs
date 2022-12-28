@@ -48,7 +48,17 @@ impl Quiz {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-struct QuizItem {
+pub struct QuizItem {
     prompt: String,
     answer: String
+}
+
+impl QuizItem {
+    pub fn get_prompt(&self) -> &String {
+        &self.prompt
+    }
+
+    pub fn get_answer(&self) -> &String {
+        &self.answer
+    }
 }
