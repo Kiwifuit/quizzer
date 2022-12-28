@@ -1,68 +1,11 @@
-use std::{process::exit, str::FromStr, fs::File};
+use std::{process::exit, fs::File};
 
 mod quiz;
 mod data;
 mod prompt;
+mod objects;
 
 const SCORE_CAP: u8 = 100;
-
-enum ConfirmChoice {
-    Yes,
-    No
-}
-
-impl FromStr for ConfirmChoice {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = s.to_lowercase();
-        if s == String::from("yes") {
-            Ok(Self::Yes)
-        } else if s == String::from("no") {
-            Ok(Self::No)
-        } else {
-            Err(format!("Unknown choice: {:?}", s))
-        }
-    }
-}
-
-impl Into<bool> for ConfirmChoice {
-    fn into(self) -> bool {
-        match self {
-            Self::Yes => true,
-            Self::No => false
-        }
-    }
-}
-
-enum Action {
-    Read,
-    Write
-}
-
-impl FromStr for Action {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = s.to_lowercase();
-        if s == String::from("read") {
-            Ok(Self::Read)
-        } else if s == String::from("write") {
-            Ok(Self::Write)
-        } else {
-            Err(format!("Unknown choice: {:?}", s))
-        }
-    }
-}
-
-impl Into<bool> for Action {
-    fn into(self) -> bool {
-        match self {
-            Self::Write => true,
-            Self::Read => false
-        }
-    }
-}
 
 fn get_perfect_score() -> u8 {
     loop {
@@ -89,7 +32,7 @@ fn get_perfect_score() -> u8 {
 fn get_quiz_count() -> u8 {
     loop {
         let count = prompt::prompt::<u8, &str>("Enter the perfect score", |_| {
-            match prompt::prompt::<ConfirmChoice, &str>("Are you sure? This cannot be changed until you restart the program (yes/no)", |_| true) {
+            match prompt::prompt::<objects::ConfirmChoice, &str>("Are you sure? This cannot be changed until you restart the program (yes/no)", |_| true) {
                 Ok(c) => c.into(),
                 Err(e) => {
                     eprintln!("An error occurred while trying to confirm the perfect score: {}", e);
@@ -164,7 +107,7 @@ fn store_quiz() {
 }
 
 fn main() {
-    let action = prompt::prompt::<Action, &str>("Enter action (read/write)", |_| true);
+    let action = prompt::prompt::<objects::Action, &str>("Enter action (read/write)", |_| true);
 
     if let Err(e) = action {
         eprintln!("An error occurred while trying to request for an action: {}", e);
