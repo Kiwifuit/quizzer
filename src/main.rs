@@ -21,7 +21,7 @@ fn get_perfect_score() -> u8 {
             eprintln!("An error occurred while getting user input: {}", e);
 
             match e {
-                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => continue,
+                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => continue,
                 prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => {
                     exit(1)
                 }
@@ -55,7 +55,7 @@ fn get_quiz_count() -> u8 {
             eprintln!("An error occurred while getting user input: {}", e);
 
             match e {
-                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => continue,
+                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => continue,
                 prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => {
                     exit(2)
                 }
@@ -78,7 +78,7 @@ fn get_name() -> String {
                 eprintln!("Error while reading/writing to the terminal: {}", e);
                 exit(1)
             }
-            prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => (),
+            prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => (),
         };
     }
 
@@ -101,7 +101,7 @@ fn store_quiz() {
                     eprintln!("Error while reading/writing to the terminal: {}", e);
                     exit(3)
                 }
-                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => (),
+                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => (),
             };
         }
 
@@ -114,7 +114,7 @@ fn store_quiz() {
                     eprintln!("Error while reading/writing to the terminal: {}", e);
                     exit(3)
                 }
-                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => (),
+                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => (),
             };
         }
 
@@ -142,7 +142,7 @@ fn read_quiz() {
         eprintln!(
             "{}",
             match e {
-                prompt::ErrorKind::ParseError => format!("The file does not exist"),
+                prompt::ErrorKind::ParseError(e) => String::from(e),
                 other => format!(
                     "An unexpected error occurred while getting a RO file: {}",
                     other

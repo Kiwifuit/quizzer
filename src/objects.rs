@@ -65,7 +65,7 @@ impl TryInto<fs::File> for ReadOnlyFile {
 }
 
 impl FromStr for ReadOnlyFile {
-    type Err = ();
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self {
