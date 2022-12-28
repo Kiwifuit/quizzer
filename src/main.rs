@@ -82,7 +82,7 @@ fn get_quiz_count() -> u8 {
     }
 }
 
-fn get_name<'a>() -> &'a str {
+fn get_name() -> String {
     // We return true on all cases because we dont need to validate anything
     // Also we use String here instead of &'a str because &str does not implement FromStr, which
     // is the constraint in `prompt`'s `Return` type
@@ -95,12 +95,12 @@ fn get_name<'a>() -> &'a str {
         };
     }
 
-    name.unwrap().as_str()
+    name.unwrap()
 }
 
 fn main() {
     let name = get_name();
     let score = get_perfect_score();
     let count = get_quiz_count();
-    let quiz = quiz::Quiz::new(name, score, count);
+    let quiz = quiz::Quiz::new(name.as_str(), score, count);
 }
