@@ -107,6 +107,34 @@ fn store_quiz() {
     }
 }
 
+fn read_quiz() {
+    let file = prompt::prompt::<objects::ReadOnlyFile, &str>("Enter file to read: ", |_| true);
+
+    if let Err(e) = &file {
+        eprintln!("{}",
+        match e {
+            prompt::ErrorKind::ParseError => format!("The file does not exist"),
+            other => format!("An unexpected error occurred while getting a RO file: {}", other)
+        });
+
+        exit(7)
+    }
+
+    let file = file.unwrap();
+    let quiz = match data::read_quiz(&mut file.try_into().unwrap()) {
+        Ok(q) => q,
+        Err(e) => {
+            match e {
+                data::ErrorKind::DeserializationError(err) => eprintln!("An error occurred while deserializing the data: {}", err),
+                data::ErrorKind::ReadError(err) => eprintln!("An error occurred while reading the file: {}", err),
+                _false_positive => ()
+            };
+
+            exit(8);
+        }
+    };
+}
+
 fn main() {
     let action = prompt::prompt::<objects::Action, &str>("Enter action (read/write)", |_| true);
 
@@ -117,5 +145,7 @@ fn main() {
 
     if action.unwrap().into() {
         store_quiz()
+    } else {
+        read_quiz()
     }
 }
