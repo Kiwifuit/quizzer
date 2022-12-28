@@ -28,8 +28,10 @@ fn get_perfect_score() -> u8 {
     }
 }
 
-fn get_name() -> String {
+fn get_name<'a>() -> &'a str {
     // We return true on all cases because we dont need to validate anything
+    // Also we use String here instead of &'a str because &str does not implement FromStr, which
+    // is the constraint in `prompt`'s `Return` type
     let name = prompt::prompt::<String, &str>("Enter your name", |_| true);
 
     if let Err(e) = &name {
@@ -39,10 +41,11 @@ fn get_name() -> String {
         };
     }
 
-    name.unwrap()
+    name.unwrap().as_str()
 }
 
 fn main() {
     let name = get_name();
     let score = get_perfect_score();
+    let quiz = quiz::Quiz::new(name, score, items);
 }
