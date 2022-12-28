@@ -59,7 +59,7 @@ fn get_perfect_score() -> u8 {
 
 fn get_quiz_count() -> u8 {
     loop {
-        let count = prompt::prompt::<u8, &str>("Enter the perfect score", |score| {
+        let count = prompt::prompt::<u8, &str>("Enter the perfect score", |_| {
             match prompt::prompt::<ConfirmChoice, &str>("Are you sure? This cannot be changed until you restart the program (yes/no)", |_| true) {
                 Ok(c) => c.into(),
                 Err(e) => {
@@ -102,5 +102,27 @@ fn main() {
     let name = get_name();
     let score = get_perfect_score();
     let count = get_quiz_count();
-    let quiz = quiz::Quiz::new(name.as_str(), score, count);
+    let mut quiz = quiz::Quiz::new(name.as_str(), score, count);
+
+    for _ in 0..count {
+        let question = prompt::prompt::<String, String>(format!("Enter question #{}", &count), |_| true);
+
+        if let Err(e) = &question {
+            match e {
+                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {eprintln!("Error while reading/writing to the terminal: {}", e); exit(3)}
+                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => ()
+            };
+        }
+
+        let answer = prompt::prompt::<String, String>(format!("Enter answer #{}", &count), |_| true);
+
+        if let Err(e) = &answer {
+            match e {
+                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {eprintln!("Error while reading/writing to the terminal: {}", e); exit(3)}
+                prompt::ErrorKind::ParseError | prompt::ErrorKind::ValidationError => ()
+            };
+        }
+
+        quiz.add_new(question.unwrap(), answer.unwrap());
+    }
 }
