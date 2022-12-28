@@ -1,4 +1,4 @@
-use std::fmt::{Display, write};
+use std::fmt::Display;
 use std::io::{Write, stdout, stdin};
 use std::str::FromStr;
 

@@ -31,12 +31,3 @@ struct QuizItem {
     prompt: String,
     answer: String
 }
-
-impl QuizItem {
-    fn new(prompt: String, answer: String) -> Self {
-        Self {
-            prompt,
-            answer
-        }
-    }
-}
