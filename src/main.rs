@@ -35,21 +35,22 @@ fn get_perfect_score() -> u8 {
 fn get_quiz_count() -> u8 {
     loop {
         let count =
-            prompt::prompt::<u8, &str>("Enter the perfect score", |_| {
-                match prompt::prompt::<objects::ConfirmChoice, &str>(
+            prompt::prompt::<u8, &str>(
+                "Enter the amount of quiz items",
+                |_| match prompt::prompt::<objects::ConfirmChoice, &str>(
                     "Are you sure? This cannot be changed until you restart the program (yes/no)",
                     |_| true,
                 ) {
                     Ok(c) => c.into(),
                     Err(e) => {
                         eprintln!(
-                            "An error occurred while trying to confirm the perfect score: {}",
-                            e
-                        );
+                        "An error occurred while trying to confirm the amount of quiz items: {}",
+                        e
+                    );
                         exit(1)
                     }
-                }
-            });
+                },
+            );
 
         if let Err(e) = count {
             eprintln!("An error occurred while getting user input: {}", e);
@@ -70,7 +71,7 @@ fn get_name() -> String {
     // We return true on all cases because we dont need to validate anything
     // Also we use String here instead of &'a str because &str does not implement FromStr, which
     // is the constraint in `prompt`'s `Return` type
-    let name = prompt::prompt::<String, &str>("Enter your name", |_| true);
+    let name = prompt::prompt::<String, &str>("Enter quiz name", |_| true);
 
     if let Err(e) = &name {
         match e {
