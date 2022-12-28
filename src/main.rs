@@ -1,4 +1,4 @@
-use std::{process::exit, str::FromStr};
+use std::{process::exit, str::FromStr, fs::File};
 
 mod quiz;
 mod data;
@@ -124,5 +124,12 @@ fn main() {
         }
 
         quiz.add_new(question.unwrap(), answer.unwrap());
+    }
+
+    let mut save_file = File::options().write(true).open(format!("{}.quiz", name)).unwrap();
+
+    if let Err(e) = data::save_quiz(&quiz, &mut save_file) {
+        eprintln!("An error occurred while trying to save quiz to a file: {}", e);
+        exit(5)
     }
 }
