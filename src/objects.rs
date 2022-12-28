@@ -9,7 +9,9 @@ impl FromStr for ConfirmChoice {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = &s.to_lowercase()[..s.len() - 1];
+        let s = s.to_lowercase();
+        let s = s.as_str();
+
         if s == "yes" {
             Ok(Self::Yes)
         } else if s == "no" {
@@ -38,7 +40,9 @@ impl FromStr for Action {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = &s.to_lowercase()[..s.len() - 1];
+        let s = s.to_lowercase();
+        let s = s.as_str();
+
         if s == "read" {
             Ok(Self::Read)
         } else if s == "write" {

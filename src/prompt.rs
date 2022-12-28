@@ -47,6 +47,8 @@ where
         Err(e) => return Err(ErrorKind::StdinReadError(e.to_string())),
     };
 
+    let buffer = buffer[..buffer.len() - 1].to_owned();
+
     if validation(&buffer) {
         return match buffer.parse() {
             Ok(parsed) => Ok(parsed),
