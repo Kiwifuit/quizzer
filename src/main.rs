@@ -124,6 +124,7 @@ fn store_quiz() {
 
     let mut save_file = File::options()
         .write(true)
+        .create_new(true)
         .open(format!("{}.quiz", name))
         .unwrap();
 
