@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, fs, io};
 
 pub enum ConfirmChoice {
     Yes,
@@ -54,6 +54,21 @@ impl Into<bool> for Action {
         match self {
             Self::Write => true,
             Self::Read => false
+        }
+    }
+}
+
+pub struct ReadOnlyFile {
+    file: String
+}
+
+impl TryInto<fs::File> for ReadOnlyFile {
+    type Error = io::Error;
+
+    fn try_into(self) -> Result<fs::File, Self::Error> {
+        match fs::File::options().read(true).open(self.file) {
+            Ok(f) => Ok(f),
+            Err(e) => Err(e)
         }
     }
 }
