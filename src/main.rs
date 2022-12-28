@@ -11,8 +11,6 @@ const SCORE_CAP: u8 = 100;
 fn get_perfect_score() -> u8 {
     loop {
         let score = prompt::prompt::<u8, &str>("Enter the perfect score", |score| {
-            dbg!(score);
-
             if score.parse::<u8>().unwrap() >= SCORE_CAP {
                 return false;
             }
@@ -94,9 +92,9 @@ fn store_quiz() {
     let count = get_quiz_count();
     let mut quiz = quiz::Quiz::new(name.as_str(), score, count);
 
-    for _ in 0..count {
+    for number in 0..count {
         let question =
-            prompt::prompt::<String, String>(format!("Enter question #{}", &count), |_| true);
+            prompt::prompt::<String, String>(format!("Enter question #{}", number), |_| true);
 
         if let Err(e) = &question {
             match e {
@@ -109,7 +107,7 @@ fn store_quiz() {
         }
 
         let answer =
-            prompt::prompt::<String, String>(format!("Enter answer #{}", &count), |_| true);
+            prompt::prompt::<String, String>(format!("Enter answer #{}", number), |_| true);
 
         if let Err(e) = &answer {
             match e {
