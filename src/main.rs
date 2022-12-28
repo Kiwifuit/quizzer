@@ -35,6 +35,35 @@ impl Into<bool> for ConfirmChoice {
     }
 }
 
+enum Action {
+    Read,
+    Write
+}
+
+impl FromStr for Action {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let s = s.to_lowercase();
+        if s == String::from("read") {
+            Ok(Self::Read)
+        } else if s == String::from("write") {
+            Ok(Self::Write)
+        } else {
+            Err(format!("Unknown choice: {:?}", s))
+        }
+    }
+}
+
+impl Into<bool> for Action {
+    fn into(self) -> bool {
+        match self {
+            Self::Write => true,
+            Self::Read => false
+        }
+    }
+}
+
 fn get_perfect_score() -> u8 {
     loop {
         let score = prompt::prompt::<u8, &str>("Enter the perfect score", |score| {
@@ -98,7 +127,7 @@ fn get_name() -> String {
     name.unwrap()
 }
 
-fn main() {
+fn store_quiz() {
     let name = get_name();
     let score = get_perfect_score();
     let count = get_quiz_count();
@@ -131,5 +160,18 @@ fn main() {
     if let Err(e) = data::save_quiz(&quiz, &mut save_file) {
         eprintln!("An error occurred while trying to save quiz to a file: {}", e);
         exit(5)
+    }
+}
+
+fn main() {
+    let action = prompt::prompt::<Action, &str>("Enter action (read/write)", |_| true);
+
+    if let Err(e) = action {
+        eprintln!("An error occurred while trying to request for an action: {}", e);
+        exit(6)
+    }
+
+    if action.unwrap().into() {
+        store_quiz()
     }
 }
