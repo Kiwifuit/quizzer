@@ -101,6 +101,11 @@ mod test {
         let res = read_quiz(&mut cursor);
 
         dbg!(&res);
+
+        if res.is_err() {
+            dbg!(cursor.into_inner());
+        }
+
         assert!(res.is_ok())
     }
 }
