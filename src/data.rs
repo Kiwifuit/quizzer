@@ -60,3 +60,47 @@ where
 
     Ok(quiz)
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn can_write() {
+        let mut cursor = Cursor::new(vec![0u8]);
+
+        let mut quiz = Quiz::new("Quiz Name", 5, 5);
+
+        quiz.add_new("First Name", "Amogus Cronut");
+        quiz.add_new("Last Name", "Suuuus");
+        quiz.add_new("A?", "AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        quiz.add_new("HMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", "noic");
+        quiz.add_new("lel", "waaaaaaaaaaaaaaaaaa");
+
+        let res = save_quiz(&quiz, &mut cursor);
+
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), 233);
+    }
+
+    #[test]
+    fn can_read() {
+        let mut cursor = Cursor::new(vec![0u8]);
+
+        let mut quiz = Quiz::new("Quiz Name", 5, 5);
+
+        quiz.add_new("First Name", "Amogus Cronut");
+        quiz.add_new("Last Name", "Suuuus");
+        quiz.add_new("A?", "AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        quiz.add_new("HMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM", "noic");
+        quiz.add_new("lel", "waaaaaaaaaaaaaaaaaa");
+
+        save_quiz(&quiz, &mut cursor).unwrap();
+
+        let res = read_quiz(&mut cursor);
+
+        dbg!(&res);
+        assert!(res.is_ok())
+    }
+}
