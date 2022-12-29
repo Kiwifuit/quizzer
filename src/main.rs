@@ -11,10 +11,15 @@ const SCORE_CAP: u8 = 100;
 fn get_perfect_score() -> u8 {
     loop {
         let score = prompt::prompt::<u8, &str>("Enter the perfect score", |score| {
-            if score.parse::<u8>().unwrap() >= SCORE_CAP {
+            let score = score.parse::<u8>();
+
+            if score.is_err() {
                 return false;
+            } else if score.unwrap() > SCORE_CAP {
+                return false;
+            } else {
+                true
             }
-            true
         });
 
         if let Err(e) = score {
