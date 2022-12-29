@@ -122,11 +122,17 @@ fn store_quiz() {
         quiz.add_new(question.unwrap(), answer.unwrap());
     }
 
-    let mut save_file = File::options()
+    let mut save_file = match File::options()
         .write(true)
         .create_new(true)
         .open(format!("{}.quiz", name))
-        .unwrap();
+    {
+        Ok(f) => f,
+        Err(e) => {
+            eprintln!("An error occurred while trying to open the file: {}", e);
+            exit(9);
+        }
+    };
 
     if let Err(e) = data::save_quiz(&quiz, &mut save_file) {
         eprintln!(
