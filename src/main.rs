@@ -167,7 +167,7 @@ fn read_quiz() {
     }
 
     let file = file.unwrap();
-    let mut quiz = match data::read_quiz(&mut file.try_into().unwrap()) {
+    let mut quiz = match data::read_quiz::<File>(&mut file.try_into().unwrap()) {
         Ok(q) => q,
         Err(e) => {
             match e {
