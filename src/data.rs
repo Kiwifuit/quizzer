@@ -45,6 +45,8 @@ where
 
 #[cfg(test)]
 mod test {
+    #![allow(unused_must_use)]
+
     use super::*;
     use std::io::{Cursor, Seek};
 
