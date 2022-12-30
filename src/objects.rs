@@ -45,7 +45,7 @@ impl FromStr for Action {
 
         if s == "read" {
             Ok(Self::Read)
-        } else if s == "write" {
+        } else if s == "create" || s == "write" {
             Ok(Self::Write)
         } else {
             Err(format!("Unknown choice: {:?}", s))

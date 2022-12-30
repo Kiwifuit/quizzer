@@ -208,7 +208,7 @@ fn read_quiz() {
 }
 
 fn main() {
-    let action = prompt::prompt::<objects::Action, &str>("Enter action (read/write)", |_| true);
+    let action = prompt::prompt::<objects::Action, &str>("Enter action (read/create)", |_| true);
 
     if let Err(e) = action {
         eprintln!(
