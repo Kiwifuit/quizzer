@@ -13,10 +13,8 @@ fn get_perfect_score() -> u8 {
         let score = prompt::prompt::<u8, &str>("Enter the perfect score", |score| {
             let score = score.parse::<u8>();
 
-            if score.is_err() {
-                return false;
-            } else if score.unwrap() > SCORE_CAP {
-                return false;
+            if score.is_err() || score.unwrap() > SCORE_CAP {
+                false
             } else {
                 true
             }
@@ -26,10 +24,8 @@ fn get_perfect_score() -> u8 {
             eprintln!("An error occurred while getting user input: {}", e);
 
             match e {
-                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => continue,
-                prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => {
-                    exit(1)
-                }
+                prompt::ErrorKind::Parse(_) | prompt::ErrorKind::Validation => continue,
+                prompt::ErrorKind::StdinRead(_) | prompt::ErrorKind::StdoutFlush(_) => exit(1),
             };
         }
 
@@ -61,10 +57,8 @@ fn get_quiz_count() -> u8 {
             eprintln!("An error occurred while getting user input: {}", e);
 
             match e {
-                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => continue,
-                prompt::ErrorKind::StdinReadError(_) | prompt::ErrorKind::StdoutFlushError(_) => {
-                    exit(2)
-                }
+                prompt::ErrorKind::Parse(_) | prompt::ErrorKind::Validation => continue,
+                prompt::ErrorKind::StdinRead(_) | prompt::ErrorKind::StdoutFlush(_) => exit(2),
             };
         }
 
@@ -80,11 +74,11 @@ fn get_name() -> String {
 
     if let Err(e) = &name {
         match e {
-            prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {
+            prompt::ErrorKind::StdoutFlush(_) | prompt::ErrorKind::StdinRead(_) => {
                 eprintln!("Error while reading/writing to the terminal: {}", e);
                 exit(1)
             }
-            prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => (),
+            prompt::ErrorKind::Parse(_) | prompt::ErrorKind::Validation => (),
         };
     }
 
@@ -107,11 +101,11 @@ fn store_quiz() {
 
         if let Err(e) = &question {
             match e {
-                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {
+                prompt::ErrorKind::StdoutFlush(_) | prompt::ErrorKind::StdinRead(_) => {
                     eprintln!("Error while reading/writing to the terminal: {}", e);
                     exit(3)
                 }
-                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => (),
+                prompt::ErrorKind::Parse(_) | prompt::ErrorKind::Validation => (),
             };
         }
 
@@ -122,11 +116,11 @@ fn store_quiz() {
 
         if let Err(e) = &answer {
             match e {
-                prompt::ErrorKind::StdoutFlushError(_) | prompt::ErrorKind::StdinReadError(_) => {
+                prompt::ErrorKind::StdoutFlush(_) | prompt::ErrorKind::StdinRead(_) => {
                     eprintln!("Error while reading/writing to the terminal: {}", e);
                     exit(3)
                 }
-                prompt::ErrorKind::ParseError(_) | prompt::ErrorKind::ValidationError => (),
+                prompt::ErrorKind::Parse(_) | prompt::ErrorKind::Validation => (),
             };
         }
 
@@ -161,7 +155,7 @@ fn read_quiz() {
         eprintln!(
             "{}",
             match e {
-                prompt::ErrorKind::ParseError(e) => String::from(e),
+                prompt::ErrorKind::Parse(e) => String::from(e),
                 other => format!(
                     "An unexpected error occurred while getting a RO file: {}",
                     other

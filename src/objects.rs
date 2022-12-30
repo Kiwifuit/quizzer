@@ -22,11 +22,11 @@ impl FromStr for ConfirmChoice {
     }
 }
 
-impl Into<bool> for ConfirmChoice {
-    fn into(self) -> bool {
-        match self {
-            Self::Yes => true,
-            Self::No => false,
+impl From<ConfirmChoice> for bool {
+    fn from(val: ConfirmChoice) -> Self {
+        match val {
+            ConfirmChoice::Yes => true,
+            ConfirmChoice::No => false,
         }
     }
 }

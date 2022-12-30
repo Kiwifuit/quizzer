@@ -4,10 +4,10 @@ use std::str::FromStr;
 
 #[derive(Debug)]
 pub enum ErrorKind {
-    StdoutFlushError(String),
-    StdinReadError(String),
-    ParseError(String),
-    ValidationError,
+    StdoutFlush(String),
+    StdinRead(String),
+    Parse(String),
+    Validation,
 }
 
 impl Display for ErrorKind {
@@ -16,10 +16,10 @@ impl Display for ErrorKind {
             f,
             "{}",
             match self {
-                Self::ValidationError => String::from("Unable to validate data"),
-                Self::ParseError(e) => format!("Unable to parse data: {}", e),
-                Self::StdoutFlushError(e) => format!("Unable to flush stdout: {}", e),
-                Self::StdinReadError(e) => format!("Unable to read stdin: {}", e),
+                Self::Validation => String::from("Unable to validate data"),
+                Self::Parse(e) => format!("Unable to parse data: {}", e),
+                Self::StdoutFlush(e) => format!("Unable to flush stdout: {}", e),
+                Self::StdinRead(e) => format!("Unable to read stdin: {}", e),
             }
         )
     }
@@ -39,12 +39,12 @@ where
     print!("{}: ", prompt);
     match stdout().flush() {
         Ok(_) => (),
-        Err(e) => return Err(ErrorKind::StdoutFlushError(e.to_string())),
+        Err(e) => return Err(ErrorKind::StdoutFlush(e.to_string())),
     };
 
     match stdin().read_line(&mut buffer) {
         Ok(_) => (),
-        Err(e) => return Err(ErrorKind::StdinReadError(e.to_string())),
+        Err(e) => return Err(ErrorKind::StdinRead(e.to_string())),
     };
 
     let buffer = buffer[..buffer.len() - 1].to_owned();
@@ -52,8 +52,8 @@ where
     if validation(&buffer) {
         return match buffer.parse() {
             Ok(parsed) => Ok(parsed),
-            Err(e) => Err(ErrorKind::ParseError(e.to_string())),
+            Err(e) => Err(ErrorKind::Parse(e.to_string())),
         };
     }
-    Err(ErrorKind::ValidationError)
+    Err(ErrorKind::Validation)
 }
