@@ -16,3 +16,25 @@ git clone https://github.com/Kiwifuit/quizzer.git
 cd quizzer
 cargo build --release
 ```
+
+## Downloading Quizzer
+Quizzer is available for the following platforms:
+- 64-bit Windows
+- 64-bit Linux
+
+## Using Quizzer
+***This is aimed for first-timers, disregard this section if you know how to use this app***
+
+Open bash/powershell, and run `quizzer`:
+```
+$ ./quizzer.x86_64
+
+or
+
+> .\quizzer-x86.exe
+```
+
+Everything is laid out step-by-step, follow the prompt and give the expected answer (if there is one)
+
+Enjoy the app :D
+- Your Local Nerd
