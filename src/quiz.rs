@@ -1,11 +1,11 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Quiz {
     name: String,
     perfect_score: u8,
     items: u8,
-    content: Vec<QuizItem>
+    content: Vec<QuizItem>,
 }
 
 impl Quiz {
@@ -14,22 +14,23 @@ impl Quiz {
             name: name.to_string(),
             perfect_score,
             items,
-            content: Vec::new()
+            content: Vec::new(),
         }
     }
 
     pub fn add_new<Entry>(&mut self, prompt: Entry, answer: Entry)
-        where
-        Entry: ToString
-        {
-            self.content.push(QuizItem { prompt: prompt.to_string(), answer: answer.to_string() });
-        }
+    where
+        Entry: ToString,
+    {
+        self.content.push(QuizItem {
+            prompt: prompt.to_string(),
+            answer: answer.to_string(),
+        });
+    }
 
-    pub fn get_item_at(&mut self, index: &usize) -> Option<QuizItem> {
+    pub fn get_item_at(&self, index: &usize) -> Option<QuizItem> {
         let content = self.clone().content;
         let item = content.get(*index);
-
-        self.content.remove(*index);
 
         Some(item.unwrap().to_owned())
     }
@@ -50,7 +51,7 @@ impl Quiz {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct QuizItem {
     prompt: String,
-    answer: String
+    answer: String,
 }
 
 impl QuizItem {
