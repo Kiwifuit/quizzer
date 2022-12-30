@@ -2,14 +2,12 @@ use std::fmt::Display;
 use std::io::{Read, Write};
 
 use crate::quiz::Quiz;
-use bincode::{deserialize, serialize};
+use bincode::{deserialize_from, serialize_into};
 
 #[derive(Debug)]
 pub enum ErrorKind {
-    SerializationError(String),
-    DeserializationError(String),
-    WriteError(String),
-    ReadError(String),
+    SerializationError(bincode::ErrorKind),
+    DeserializationError(bincode::ErrorKind),
 }
 
 impl Display for ErrorKind {
@@ -20,25 +18,18 @@ impl Display for ErrorKind {
             match self {
                 Self::DeserializationError(e) => format!("Unable to read data: {}", e),
                 Self::SerializationError(e) => format!("Unable to write data: {}", e),
-                Self::ReadError(e) => format!("Unable to read file: {}", e),
-                Self::WriteError(e) => format!("Unable to write data to file: {}", e),
             }
         )
     }
 }
 
-pub fn save_quiz<F>(quiz: &Quiz, file: &mut F) -> Result<usize, ErrorKind>
+pub fn save_quiz<F>(quiz: &Quiz, file: &mut F) -> Result<(), ErrorKind>
 where
     F: Write,
 {
-    let data = match serialize(quiz) {
-        Ok(d) => d,
-        Err(e) => return Err(ErrorKind::SerializationError(e.to_string())),
-    };
-
-    match file.write(&data) {
-        Ok(size) => Ok(size),
-        Err(e) => Err(ErrorKind::WriteError(e.to_string())),
+    match serialize_into(file, quiz) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ErrorKind::SerializationError(*e)),
     }
 }
 
@@ -46,25 +37,16 @@ pub fn read_quiz<F>(file: &mut F) -> Result<Quiz, ErrorKind>
 where
     F: Read,
 {
-    let mut raw = vec![];
-
-    match file.read(&mut raw) {
-        Ok(_) => (),
-        Err(e) => return Err(ErrorKind::ReadError(e.to_string())),
-    };
-
-    let quiz = match deserialize(&raw) {
-        Ok(q) => q,
-        Err(e) => return Err(ErrorKind::DeserializationError(e.to_string())),
-    };
-
-    Ok(quiz)
+    match deserialize_from(file) {
+        Ok(q) => Ok(q),
+        Err(e) => Err(ErrorKind::DeserializationError(*e)),
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::io::Cursor;
+    use std::io::{Cursor, Seek};
 
     #[test]
     fn can_write() {
@@ -81,12 +63,11 @@ mod test {
         let res = save_quiz(&quiz, &mut cursor);
 
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 233);
     }
 
     #[test]
     fn can_read() {
-        let mut cursor = Cursor::new(vec![0u8]);
+        let mut cursor = Cursor::new(vec![]);
 
         let mut quiz = Quiz::new("Quiz Name", 5, 5);
 
@@ -97,6 +78,8 @@ mod test {
         quiz.add_new("lel", "waaaaaaaaaaaaaaaaaa");
 
         save_quiz(&quiz, &mut cursor).unwrap();
+
+        cursor.seek(std::io::SeekFrom::Start(0));
 
         let res = read_quiz(&mut cursor);
 

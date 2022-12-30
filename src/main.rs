@@ -174,9 +174,6 @@ fn read_quiz() {
                 data::ErrorKind::DeserializationError(err) => {
                     eprintln!("An error occurred while deserializing the data: {}", err)
                 }
-                data::ErrorKind::ReadError(err) => {
-                    eprintln!("An error occurred while reading the file: {}", err)
-                }
                 _false_positive => (),
             };
 
