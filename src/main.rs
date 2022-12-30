@@ -98,8 +98,12 @@ fn store_quiz() {
     let mut quiz = quiz::Quiz::new(name.as_str(), score, count);
 
     for number in 0..count {
-        let question =
-            prompt::prompt::<String, String>(format!("Enter question #{}", number), |_| true);
+        let question_number = number + 1;
+
+        let question = prompt::prompt::<String, String>(
+            format!("Enter question #{}", question_number),
+            |_| true,
+        );
 
         if let Err(e) = &question {
             match e {
@@ -112,7 +116,9 @@ fn store_quiz() {
         }
 
         let answer =
-            prompt::prompt::<String, String>(format!("Enter answer #{}", number), |_| true);
+            prompt::prompt::<String, String>(format!("Enter answer #{}", question_number), |_| {
+                true
+            });
 
         if let Err(e) = &answer {
             match e {
@@ -149,7 +155,7 @@ fn store_quiz() {
 }
 
 fn read_quiz() {
-    let file = prompt::prompt::<objects::ReadOnlyFile, &str>("Enter file to read: ", |_| true);
+    let file = prompt::prompt::<objects::ReadOnlyFile, &str>("Enter file to read", |_| true);
 
     if let Err(e) = &file {
         eprintln!(
@@ -193,7 +199,7 @@ fn read_quiz() {
         if let Some(item) = item {
             println!(
                 "Question #{}:\n\t{:?}\n\tAnswer: {:?}",
-                indx,
+                indx + 1,
                 item.get_prompt(),
                 item.get_answer()
             )
